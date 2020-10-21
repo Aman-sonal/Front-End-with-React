@@ -3,6 +3,7 @@ import { Card, CardImg, CardText, CardBody,
     CardTitle, Button, Breadcrumb, BreadcrumbItem, Modal, ModalHeader, ModalBody, Form, FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors } from 'react-redux-form';
+import Loading from './loadingcomp'; 
 
 const maxLength = (len) => (val) => !val || (val.length <= len);
 const minLength = (len) => (val) => val && (val.length >= len);
@@ -17,12 +18,13 @@ const minLength = (len) => (val) => val && (val.length >= len);
         this.toggleModal = this.toggleModal.bind(this);
         this.handleSubmit= this.handleSubmit.bind(this);
     }
+
     toggleModal() {
         this.setState({
         isModalOpen: !this.state.isModalOpen
     });
   }
-   
+
   handleSubmit(values) {
       this.toggleModal();
       this.props.addComment(this.props.dishId,values.rating, values.author,values.comment);
@@ -126,7 +128,7 @@ function RenderComments({comments, addComment,dishId})
               <ul className="list-unstyled">
                   {cmntlist}
               </ul>
-              <CommentForm addComment={addComment} dish={dishId}/>
+              <CommentForm addComment={addComment} dish={dishId} />
           </div>
       );    
     }
@@ -137,7 +139,26 @@ function RenderComments({comments, addComment,dishId})
 }
     const DishDetail = (props) => 
     {
-        if(props.dish!=null)
+        if(props.isLoading)
+        {
+            return(
+                <div className="container">
+                    <div className="row">
+                        <Loading />
+                    </div>
+                </div>
+            );
+        }
+        else if(props.errMess){
+            return(
+                <div className="container">
+                    <div className="row">
+                        <h4>{props.errMess}</h4>
+                    </div>
+                </div>
+            );
+        }
+        else if(props.dish!=null)
         {
             return(
                 <div className="container">
@@ -153,7 +174,7 @@ function RenderComments({comments, addComment,dishId})
                     <div className="row row-content">
                         <RenderDish dish={props.dish} />
                         <RenderComments comments= {props.comments} 
-                            addComments= {props.addComments} 
+                            addComment= {props.addComment} 
                             dishId={props.dish.id} />
                     </div>
                 </div>
